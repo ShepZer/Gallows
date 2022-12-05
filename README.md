@@ -1,2 +1,2 @@
 # Gallows
-Word game: two people play, the first one thinks of a word, enters it into a computer.
+Word game: two people play, the first one thinks of a word, enters it into a computer. The computer for the second player shows on the screen the first and last letter of the intended word, instead of the rest of the letters - dashes. The player tries to guess the intended word by entering the appropriate letters. If the entered letter is not in the word, the elements of the “gallows” appear on the screen, etc.
