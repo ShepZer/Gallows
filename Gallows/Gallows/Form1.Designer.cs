@@ -86,7 +86,6 @@ namespace Gallows
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Gallow";
             this.Text = "Form1";
-            this.SizeChanged += new System.EventHandler(this.Gallow_SizeChanged);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -12,6 +12,7 @@ using System.Threading;
 using System.Diagnostics;
 using System.IO;
 
+//сделать исключение: 763, 1353
 namespace Gallows{
     public partial class Gallow : Form {
 
@@ -156,6 +157,7 @@ namespace Gallows{
             buttBack.Location = new Point(1300, 750);
             buttBack.Enabled = true;
             buttBack.Text = "Назад";
+            buttBack.BackColor = Color.AliceBlue;
             buttBack.Font = new Font(buttBack.Font.Name, 10, buttBack.Font.Style, buttBack.Font.Unit);
             buttBack.Click += new EventHandler(entreWordFinish);
 
@@ -210,26 +212,40 @@ namespace Gallows{
                     randWord();
                     break;
                 case 600://-------------НАЧАТЬ
-                    if (textBoxPlay.TextLength != 0){
-                        StreamReader sr = new StreamReader("dictionary.txt");
-                        for (int i = 0; i < 51302; i++){//перебираем все слова в словаре
-                            bd = sr.ReadLine();
-                            if(textBoxPlay.Text == bd) {//проверка введенного слова
-                                string word = textBoxPlay.Text;
-                                char_word = word.ToCharArray();
-                                size_word = word.Length;
-                                lettersLeft = size_word - 2;//уменьшаем на 2 потому что 1 и последняя буква выводятся в самом начале
-                                flag = true;
-                                Controls.Clear();
-                                pressedButtonmeny.Dispose();
-                                GC.Collect();
-                                StartGame();
+                    try{
+                        if (textBoxPlay.TextLength != 0){
+
+                            StreamReader sr = new StreamReader("dictionary.txt");
+                            
+                            for (int i = 0; i < 51302; i++){//перебираем все слова в словаре
+                                bd = sr.ReadLine();
+
+                                if (textBoxPlay.Text == bd){//проверка введенного слова
+                                    string word = textBoxPlay.Text;
+                                    char_word = word.ToCharArray();
+                                    size_word = word.Length;
+                                    lettersLeft = size_word - 2;//уменьшаем на 2 потому что 1 и последняя буква выводятся в самом начале
+                                    flag = true;
+                                    Controls.Clear();
+                                    pressedButtonmeny.Dispose();
+                                    GC.Collect();
+                                    StartGame();
+                                }
+                            }
+                            sr.Close();
+                            if (flag == false){ 
+                                throw new Exception(); 
                             }
                         }
-                        sr.Close();
-                        if (flag == false) {
-                            MessageBox.Show("Введенное слово не существует в словар. Попробуйте другое слово или проверьте это на корректность ввода."); 
+                        else{
+                            throw new Exception();
                         }
+                    }
+                    catch(Exception) when (textBoxPlay.TextLength == 0){
+                        MessageBox.Show("Введите слово для игры");
+                    }
+                    catch(Exception) when (flag == false){
+                        MessageBox.Show("Введенное слово не существует в словар. Попробуйте другое слово или проверьте это на корректность ввода.");
                     }
                     break;
             }
@@ -444,51 +460,6 @@ namespace Gallows{
 
             grap.Dispose();
             GC.Collect();
-
-            /*Image part = new Bitmap(200, 200);
-            Graphics grap = Graphics.FromImage(part);
-            switch (a){
-                case 10:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 0, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 9:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 200, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 8:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 400, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 7:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 600, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 6:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 800, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 5:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 1000, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 4:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 1200, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 3:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 1400, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 2:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 1600, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-                case 1:
-                    grap.DrawImage(gallowSprites, new Rectangle(0, 0, 200, 200), 1800, 0, 200, 200, GraphicsUnit.Pixel);
-                    pic[0].BackgroundImage = part;
-                    break;
-            }*/
         }//рисую виселицу
 
         public void showWord(int t){//показывает верно выбранную букву в слове
@@ -637,12 +608,23 @@ namespace Gallows{
                         Application.Exit();
                     }
                     else{
-                        if (textNameFinish.TextLength == 0 & textFullnameFinish.TextLength == 0){
+                        try{
+                            if (textNameFinish.TextLength == 0 & textFullnameFinish.TextLength == 0){
+                                throw new Exception();
+                            }
+                            else{
+                                if (textNameFinish.TextLength == 0) { throw new Exception(); }
+                                else { throw new Exception(); }
+                            }
+                        }
+                        catch(Exception) when (textNameFinish.TextLength == 0 & textFullnameFinish.TextLength == 0){
                             MessageBox.Show("Введите Имя и Фамилию");
                         }
-                        else{
-                            if (textNameFinish.TextLength == 0) { MessageBox.Show("Введите Имя"); }
-                            else { MessageBox.Show("Введите Фамилию"); }
+                        catch(Exception) when (textNameFinish.TextLength == 0){
+                            MessageBox.Show("Введите Имя");
+                        }
+                        catch(Exception) when (textFullnameFinish.TextLength == 0){
+                            MessageBox.Show("Введите Фамилию");
                         }
                     }
                     break;
@@ -791,21 +773,22 @@ namespace Gallows{
             bool testName = false;
             switch (pressedButton.Location.X){
                 case 275://кнопка "сохранить и выйти"
-                    if (textName.TextLength != 0){
-                        GC.Collect();
-                        testNormalName = Convert.ToString(textName);
-                        for (int i = 0; i < textName.TextLength; i++){
-                            if(testNormalName[i] == '/'){
-                                testName = true;
-                                MessageBox.Show("Такого имени не существует. Тупица!");
+                        if (textName.TextLength != 0){
+                            GC.Collect();
+                            testNormalName = Convert.ToString(textName.Text);
+                            for (int i = 0; i < textName.TextLength; i++){
+                                if(testNormalName[i] == '/'){
+                                    testName = true;
+                                    MessageBox.Show("Такого имени не существует. Тупица!");//пользователь хочет ввести 
+                                    break;
+                                }
                             }
+                            if(testName == false) { 
+                                SaveGame(); 
+                            }
+                            //testName = false; 
                         }
-                        if(testName == false) { 
-                            SaveGame(); 
-                        }
-                        testName = false;
-                    }
-                    break;
+                        break;
                 case 825://кнопка "выйти"
                     Application.Exit();
                     numberOfAttempts = 10;
@@ -909,6 +892,7 @@ namespace Gallows{
                 buttSave1.Size = new Size(400, 150);
                 buttSave1.Location = new Point(550, 200);
                 buttSave1.Enabled = true;
+                buttSave1.BackColor = Color.AliceBlue;
                 for (int i = 0; save1[i] != '/'; i++){
                     buttSave1.Text += save1[i];
                     buttSave1.Font = new Font(buttSave1.Font.Name, 20, buttSave1.Font.Style, buttSave1.Font.Unit);
@@ -920,6 +904,7 @@ namespace Gallows{
                 buttSave2.Size = new Size(400, 150);
                 buttSave2.Location = new Point(550, 400);
                 buttSave2.Enabled = true;
+                buttSave2.BackColor = Color.AliceBlue;
                 for (int i = 0; save2[i] != '/'; i++){ 
                     buttSave2.Text += save2[i];
                     buttSave2.Font = new Font(buttSave2.Font.Name, 20, buttSave2.Font.Style, buttSave2.Font.Unit);
@@ -931,6 +916,7 @@ namespace Gallows{
                 buttSave3.Size = new Size(400, 150);
                 buttSave3.Location = new Point(550, 600);
                 buttSave3.Enabled = true;
+                buttSave3.BackColor = Color.AliceBlue;
                 for (int i = 0; save3[i] != '/'; i++){
                     buttSave3.Text += save3[i];
                     buttSave3.Font = new Font(buttSave3.Font.Name, 20, buttSave3.Font.Style, buttSave3.Font.Unit);
@@ -1103,7 +1089,8 @@ namespace Gallows{
 
             Button buttSave1 = new Button();
             buttSave1.Size = new Size(400, 150);
-            buttSave1.Location = new Point(550, 200); 
+            buttSave1.Location = new Point(550, 200);
+            buttSave1.BackColor = Color.AliceBlue;
             if (save1.Length != 0) {//если первая ячейка не пустая деактивируем ее
                 buttSave1.Enabled = true;
                 for (int i = 0; save1[i] != '/'; i++) {
@@ -1120,6 +1107,7 @@ namespace Gallows{
             Button buttSave2 = new Button();
             buttSave2.Size = new Size(400, 150);
             buttSave2.Location = new Point(550, 400);
+            buttSave2.BackColor = Color.AliceBlue;
             if (save2.Length != 0) {//если вторая ячейка не пустая деактивируем ее
                 buttSave2.Enabled = true;
                 for (int i = 0; save2[i] != '/'; i++) {
@@ -1136,6 +1124,7 @@ namespace Gallows{
             Button buttSave3 = new Button();
             buttSave3.Size = new Size(400, 150);
             buttSave3.Location = new Point(550, 600);
+            buttSave3.BackColor = Color.AliceBlue;
             if (save3.Length != 0) {//если третья ячейка не пустая деактивируем ее
                 buttSave3.Enabled = true;
                 for (int i = 0; save3[i] != '/'; i++){
@@ -1152,6 +1141,7 @@ namespace Gallows{
             Button buttBack = new Button();//кнопка "Назад"
             buttBack.Size = new Size(200, 80);
             buttBack.Location = new Point(1250, 750);
+            buttBack.BackColor = Color.AliceBlue;
             buttBack.Enabled = true;
             buttBack.Font = new Font(buttBack.Font.Name, 16, buttBack.Font.Style, buttBack.Font.Unit);
             buttBack.Text = "Назад";
@@ -1166,8 +1156,6 @@ namespace Gallows{
             //даня/университет/11/10000000001/00:00:00.6752044/10/
             int flag1 = 0;//флаг для того чтобы пропустить Имя (оно в сохранении идет первым)
             int j = 0;//для записи имя
-            //int step = 0;//для степени
-            //int skip = 2;
             timeSave = null;//время игры
             switch (pressedButton.Location.Y){
                 case 750://кнопка назад
@@ -1369,8 +1357,9 @@ namespace Gallows{
 
         public void keyboardCheck(){//метод вызываемый при запуске сохранения
 
-            lettersLeft = size_word - 2;
-            if (correctLetters != null){
+            try{
+                lettersLeft = size_word - 2;
+                if (correctLetters == null) { throw new Exception(); }
                 for (int i = 1; i < size_word - 1; i++){ //вывести в слове буквы
                     for (int j = 0; j < correctLetters.Length; j++){
                         if (char_word[i] == correctLetters[j]){
@@ -1393,9 +1382,12 @@ namespace Gallows{
                         }
                     }
                 }
-
+                
             }
-            if (wrongLetters != null){
+            catch(Exception) {}
+
+            try{
+                if (wrongLetters == null) { throw new Exception(); }
                 for (int i = 0; i < 3; i++){//отмечаем буквы, которые были введены неверно
                     for (int j = 0; j < 11; j++){
                         for (int k = 0; k < wrongLetters.Length; k++){
@@ -1408,324 +1400,9 @@ namespace Gallows{
                     }
                 }
             }
-
+            catch (Exception){}
             GC.Collect();
-            drawGallows(numberOfAttempts + 1);//выводим нужный этап виселицы
-            /*for (int i = 1; i < size_word - 1; i++){//Окрашивает верно выбранные буквы на клавиатуре
-                if (guessedLetters[i] == '1'){
-                    lettersLeft--;
-                    switch (char_word[i]){
-                        case 'а':
-                            butts[i].Text = "а";
-                            abcButts[0, 0].Enabled = false;
-                            abcButts[0, 0].BackColor = Color.Green;
-                            break;
-                        case 'б':
-                            butts[i].Text = "б";
-                            abcButts[0, 1].Enabled = false;
-                            abcButts[0, 1].BackColor = Color.Green;
-                            break;
-                        case 'в':
-                            butts[i].Text = "в";
-                            abcButts[0, 2].Enabled = false;
-                            abcButts[0, 2].BackColor = Color.Green;
-                            break;
-                        case 'г':
-                            butts[i].Text = "г";
-                            abcButts[0, 3].Enabled = false;
-                            abcButts[0, 3].BackColor = Color.Green;
-                            break;
-                        case 'д':
-                            butts[i].Text = "д";
-                            abcButts[0, 4].Enabled = false;
-                            abcButts[0, 4].BackColor = Color.Green;
-                            break;
-                        case 'е':
-                            butts[i].Text = "е";
-                            abcButts[0, 5].Enabled = false;
-                            abcButts[0, 5].BackColor = Color.Green;
-                            break;
-                        case 'ё':
-                            butts[i].Text = "ё";
-                            abcButts[0, 6].Enabled = false;
-                            abcButts[0, 6].BackColor = Color.Green;
-                            break;
-                        case 'ж':
-                            butts[i].Text = "ж";
-                            abcButts[0, 7].Enabled = false;
-                            abcButts[0, 7].BackColor = Color.Green;
-                            break;
-                        case 'з':
-                            butts[i].Text = "з";
-                            abcButts[0, 8].Enabled = false;
-                            abcButts[0, 8].BackColor = Color.Green;
-                            break;
-                        case 'и':
-                            butts[i].Text = "и";
-                            abcButts[0, 9].Enabled = false;
-                            abcButts[0, 9].BackColor = Color.Green;
-                            break;
-                        case 'й':
-                            butts[i].Text = "й";
-                            abcButts[0, 10].Enabled = false;
-                            abcButts[0, 10].BackColor = Color.Green;
-                            break;
-                        case 'к':
-                            butts[i].Text = "к";
-                            abcButts[1, 0].Enabled = false;
-                            abcButts[1, 0].BackColor = Color.Green;
-                            break;
-                        case 'л':
-                            butts[i].Text = "л";
-                            abcButts[1, 1].Enabled = false;
-                            abcButts[1, 1].BackColor = Color.Green;
-                            break;
-                        case 'м':
-                            butts[i].Text = "м";
-                            abcButts[1, 2].Enabled = false;
-                            abcButts[1, 2].BackColor = Color.Green;
-                            break;
-                        case 'н':
-                            butts[i].Text = "н";
-                            abcButts[1, 3].Enabled = false;
-                            abcButts[1, 3].BackColor = Color.Green;
-                            break;
-                        case 'о':
-                            butts[i].Text = "о";
-                            abcButts[1, 4].Enabled = false;
-                            abcButts[1, 4].BackColor = Color.Green;
-                            break;
-                        case 'п':
-                            butts[i].Text = "п";
-                            abcButts[1, 5].Enabled = false;
-                            abcButts[1, 5].BackColor = Color.Green;
-                            break;
-                        case 'р':
-                            butts[i].Text = "р";
-                            abcButts[1, 6].Enabled = false;
-                            abcButts[1, 6].BackColor = Color.Green;
-                            break;
-                        case 'с':
-                            butts[i].Text = "с";
-                            abcButts[1, 7].Enabled = false;
-                            abcButts[1, 7].BackColor = Color.Green;
-                            break;
-                        case 'т':
-                            butts[i].Text = "т";
-                            abcButts[1, 8].Enabled = false;
-                            abcButts[1, 8].BackColor = Color.Green;
-                            break;
-                        case 'у':
-                            butts[i].Text = "у";
-                            abcButts[1, 9].Enabled = false;
-                            abcButts[1, 9].BackColor = Color.Green;
-                            break;
-                        case 'ф':
-                            butts[i].Text = "ф";
-                            abcButts[1, 10].Enabled = false;
-                            abcButts[1, 10].BackColor = Color.Green;
-                            break;
-                        case 'х':
-                            butts[i].Text = "х";
-                            abcButts[2, 0].Enabled = false;
-                            abcButts[2, 0].BackColor = Color.Green;
-                            break;
-                        case 'ц':
-                            butts[i].Text = "ц";
-                            abcButts[2, 1].Enabled = false;
-                            abcButts[2, 1].BackColor = Color.Green;
-                            break;
-                        case 'ч':
-                            butts[i].Text = "ч";
-                            abcButts[2, 2].Enabled = false;
-                            abcButts[2, 2].BackColor = Color.Green;
-                            break;
-                        case 'ш':
-                            butts[i].Text = "ш";
-                            abcButts[2, 3].Enabled = false;
-                            abcButts[2, 3].BackColor = Color.Green;
-                            break;
-                        case 'щ':
-                            butts[i].Text = "щ";
-                            abcButts[2, 4].Enabled = false;
-                            abcButts[2, 4].BackColor = Color.Green;
-                            break;
-                        case 'ъ':
-                            butts[i].Text = "ъ";
-                            abcButts[2, 5].Enabled = false;
-                            abcButts[2, 5].BackColor = Color.Green;
-                            break;
-                        case 'ы':
-                            butts[i].Text = "ы";
-                            abcButts[2, 6].Enabled = false;
-                            abcButts[2, 6].BackColor = Color.Green;
-                            break;
-                        case 'ь':
-                            butts[i].Text = "ь";
-                            abcButts[2, 7].Enabled = false;
-                            abcButts[2, 7].BackColor = Color.Green;
-                            break;
-                        case 'э':
-                            butts[i].Text = "э";
-                            abcButts[2, 8].Enabled = false;
-                            abcButts[2, 8].BackColor = Color.Green;
-                            break;
-                        case 'ю':
-                            butts[i].Text = "ю";
-                            abcButts[2, 9].Enabled = false;
-                            abcButts[2, 9].BackColor = Color.Green;
-                            break;
-                        case 'я':
-                            butts[i].Text = "я";
-                            abcButts[2, 10].Enabled = false;
-                            abcButts[2, 10].BackColor = Color.Green;
-                            break;
-                    }
-                }
-            }
-            if(wordABC.Length != 0){////Окрашивает неверно выбранные буквы на клавиатуре
-                for (int i = 0; i < wordABC.Length; i++){
-                    switch (wordABC[i]){
-                        case 'а':
-                            abcButts[0, 0].Enabled = false;
-                            abcButts[0, 0].BackColor = Color.Red;
-                            break;
-                        case 'б':
-                            abcButts[0, 1].Enabled = false;
-                            abcButts[0, 1].BackColor = Color.Red;
-                            break;
-                        case 'в':
-                            abcButts[0, 2].Enabled = false;
-                            abcButts[0, 2].BackColor = Color.Red;
-                            break;
-                        case 'г':
-                            abcButts[0, 3].Enabled = false;
-                            abcButts[0, 3].BackColor = Color.Red;
-                            break;
-                        case 'д':
-                            abcButts[0, 4].Enabled = false;
-                            abcButts[0, 4].BackColor = Color.Red;
-                            break;
-                        case 'е':
-                            abcButts[0, 5].Enabled = false;
-                            abcButts[0, 5].BackColor = Color.Red;
-                            break;
-                        case 'ё':
-                            abcButts[0, 6].Enabled = false;
-                            abcButts[0, 6].BackColor = Color.Red;
-                            break;
-                        case 'ж':
-                            abcButts[0, 7].Enabled = false;
-                            abcButts[0, 7].BackColor = Color.Red;
-                            break;
-                        case 'з':
-                            abcButts[0, 8].Enabled = false;
-                            abcButts[0, 8].BackColor = Color.Red;
-                            break;
-                        case 'и':
-                            abcButts[0, 9].Enabled = false;
-                            abcButts[0, 9].BackColor = Color.Red;
-                            break;
-                        case 'й':
-                            abcButts[0, 10].Enabled = false;
-                            abcButts[0, 10].BackColor = Color.Red;
-                            break;
-                        case 'к':
-                            abcButts[1, 0].Enabled = false;
-                            abcButts[1, 0].BackColor = Color.Red;
-                            break;
-                        case 'л':
-                            abcButts[1, 1].Enabled = false;
-                            abcButts[1, 1].BackColor = Color.Red;
-                            break;
-                        case 'м':
-                            abcButts[1, 2].Enabled = false;
-                            abcButts[1, 2].BackColor = Color.Red;
-                            break;
-                        case 'н':
-                            abcButts[1, 3].Enabled = false;
-                            abcButts[1, 3].BackColor = Color.Red;
-                            break;
-                        case 'о':
-                            abcButts[1, 4].Enabled = false;
-                            abcButts[1, 4].BackColor = Color.Red;
-                            break;
-                        case 'п':
-                            abcButts[1, 5].Enabled = false;
-                            abcButts[1, 5].BackColor = Color.Red;
-                            break;
-                        case 'р':
-                            abcButts[1, 6].Enabled = false;
-                            abcButts[1, 6].BackColor = Color.Red;
-                            break;
-                        case 'с':
-                            abcButts[1, 7].Enabled = false;
-                            abcButts[1, 7].BackColor = Color.Red;
-                            break;
-                        case 'т':
-                            abcButts[1, 8].Enabled = false;
-                            abcButts[1, 8].BackColor = Color.Red;
-                            break;
-                        case 'у':
-                            abcButts[1, 9].Enabled = false;
-                            abcButts[1, 9].BackColor = Color.Red;
-                            break;
-                        case 'ф':
-                            abcButts[1, 10].Enabled = false;
-                            abcButts[1, 10].BackColor = Color.Red;
-                            break;
-                        case 'х':
-                            abcButts[2, 0].Enabled = false;
-                            abcButts[2, 0].BackColor = Color.Red;
-                            break;
-                        case 'ц':
-                            abcButts[2, 1].Enabled = false;
-                            abcButts[2, 1].BackColor = Color.Red;
-                            break;
-                        case 'ч':
-                            abcButts[2, 2].Enabled = false;
-                            abcButts[2, 2].BackColor = Color.Red;
-                            break;
-                        case 'ш':
-                            abcButts[2, 3].Enabled = false;
-                            abcButts[2, 3].BackColor = Color.Red;
-                            break;
-                        case 'щ':
-                            abcButts[2, 4].Enabled = false;
-                            abcButts[2, 4].BackColor = Color.Red;
-                            break;
-                        case 'ъ':
-                            abcButts[2, 5].Enabled = false;
-                            abcButts[2, 5].BackColor = Color.Red;
-                            break;
-                        case 'ы':
-                            abcButts[2, 6].Enabled = false;
-                            abcButts[2, 6].BackColor = Color.Red;
-                            break;
-                        case 'ь':
-                            abcButts[2, 7].Enabled = false;
-                            abcButts[2, 7].BackColor = Color.Red;
-                            break;
-                        case 'э':
-                            abcButts[2, 8].Enabled = false;
-                            abcButts[2, 8].BackColor = Color.Red;
-                            break;
-                        case 'ю':
-                            abcButts[2, 9].Enabled = false;
-                            abcButts[2, 9].BackColor = Color.Red;
-                            break;
-                        case 'я':
-                            abcButts[2, 10].Enabled = false;
-                            abcButts[2, 10].BackColor = Color.Red;
-                            break;
-                    }
-                }
-            }*/
+            drawGallows(numberOfAttempts + 1);
         }//метод вызываемый при запуске сохранения
-
-        private void Gallow_SizeChanged(object sender, EventArgs e){
-            //MessageBox.Show("!!!");
-            //MessageBox.Show(Convert.ToString(this.Size.Width) +" " + Convert.ToString(this.Size.Height));
-        }
     }
 }
