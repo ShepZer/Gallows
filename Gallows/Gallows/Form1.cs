@@ -12,7 +12,6 @@ using System.Threading;
 using System.Diagnostics;
 using System.IO;
 
-//сделать исключение: 763, 1353
 namespace Gallows{
     public partial class Gallow : Form {
 
@@ -70,7 +69,9 @@ namespace Gallows{
         }
 
         public void InitMeny(){//Создаем элементы меню
-            
+
+            numberOfAttempts = 10;
+
             StreamReader sr = new StreamReader("Saves.txt");
             save1 = sr.ReadLine();//считываем первое сохранение
             save2 = sr.ReadLine();//считываем второе сохранение
@@ -194,12 +195,12 @@ namespace Gallows{
 
             buttRand.Text = ("Случайное слово");
             GC.Collect();
-        }//менюшка после нажатия на "ИГРАТЬ"
+        }//менюшка после нажатия на "Новая игра"
 
         public void entreWordFinish(object sender, EventArgs e){//Оброботка кнопок в подменю "ИГРАТЬ"
             
-            string bd;
-            bool flag = false;
+            string wordFromDictionary;//сюда будут записывать слова из словоря
+            bool flag = false;//если слово в словаре есть, то поменяется на True.
 
             Button pressedButtonmeny = sender as Button;
             switch (pressedButtonmeny.Location.Y){
@@ -218,9 +219,9 @@ namespace Gallows{
                             StreamReader sr = new StreamReader("dictionary.txt");
                             
                             for (int i = 0; i < 51302; i++){//перебираем все слова в словаре
-                                bd = sr.ReadLine();
+                                wordFromDictionary = sr.ReadLine();
 
-                                if (textBoxPlay.Text == bd){//проверка введенного слова
+                                if (textBoxPlay.Text == wordFromDictionary){//проверка введенного слова
                                     string word = textBoxPlay.Text;
                                     char_word = word.ToCharArray();
                                     size_word = word.Length;
@@ -331,7 +332,7 @@ namespace Gallows{
                     abcButts[i, j] = new Button();
                     Button abcbutt = new Button();
                     abcbutt.Size = new Size(70, 70);
-                    abcbutt.Location = new Point((this.Size.Width - 880)/2 + j * 80, 500 + i * 80); //330 + i * 80
+                    abcbutt.Location = new Point(310 + j * 80, 500 + i * 80); 
                     abcbutt.Font = new Font(abcbutt.Font.Name, 20, abcbutt.Font.Style, abcbutt.Font.Unit);
 
                     abcbutt.BackColor = Color.Orange;
@@ -471,7 +472,6 @@ namespace Gallows{
         public void win(){//есть игрок победил
             Controls.Clear();
             needSave = false;
-            numberOfAttempts = 10;
             
             //----------------------------------------форма для заполнения ФИ игрока
             Label labelN = new Label();
@@ -535,7 +535,6 @@ namespace Gallows{
 
         public void lose(){//Игрок проиграл
             Controls.Clear();
-            numberOfAttempts = 10;
 
             needSave = false;
             //-----------------------------------для ввода ФИ
@@ -770,25 +769,29 @@ namespace Gallows{
         public void OnButtonPressExit(object sender, EventArgs e){//обработка нажатия в меню выхода из игры (незавершенная игра)
             Button pressedButton = sender as Button;
             string testNormalName;
-            bool testName = false;
             switch (pressedButton.Location.X){
                 case 275://кнопка "сохранить и выйти"
+                    try{
                         if (textName.TextLength != 0){
                             GC.Collect();
                             testNormalName = Convert.ToString(textName.Text);
                             for (int i = 0; i < textName.TextLength; i++){
-                                if(testNormalName[i] == '/'){
-                                    testName = true;
-                                    MessageBox.Show("Такого имени не существует. Тупица!");//пользователь хочет ввести 
-                                    break;
+                                if (testNormalName[i] == '/'){
+                                    throw new Exception();
                                 }
                             }
-                            if(testName == false) { 
-                                SaveGame(); 
-                            }
-                            //testName = false; 
+                            SaveGame();                        }
+                        else{
+                            throw new Exception();
                         }
-                        break;
+                    }
+                    catch (Exception) when(textName.TextLength == 0){
+                        MessageBox.Show("Введите название сохранения!");
+                    }
+                    catch (Exception){
+                        MessageBox.Show("Название сохранения не может содержать символ '/'");
+                    }
+                    break;
                 case 825://кнопка "выйти"
                     Application.Exit();
                     numberOfAttempts = 10;

@@ -85,7 +85,7 @@ namespace Gallows
             this.Font = new System.Drawing.Font("Candara Light", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Gallow";
-            this.Text = "Form1";
+            this.Text = "Gallows";
             this.ResumeLayout(false);
             this.PerformLayout();
 
