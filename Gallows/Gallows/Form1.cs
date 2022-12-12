@@ -23,12 +23,14 @@ namespace Gallows{
         public string correctLetters;//строка для хранения букв, которые пользователь вводил до сохранение (только верные буквы)
         public bool needSave = false;//флаг, который позволяет использовать данные, если пользователь хочет продолжить игру
         public bool winLose;//переименная, которая отмечает победил игрок или проиграл false - проиграл, true - победил
+        public string tester;
 
         public string save1;//первая ячейка сохранения
 
         public string save2;//вторая ячейка сохранения
 
         public string save3;//третья ячейка сохранения
+        public string save4;
 
         public Image gallowSprites;
         public Button[] pic = new Button[1];//сюда выводиться рисунок
@@ -76,6 +78,8 @@ namespace Gallows{
             save1 = sr.ReadLine();//считываем первое сохранение
             save2 = sr.ReadLine();//считываем второе сохранение
             save3 = sr.ReadLine();//считываем третье сохрнанение
+            save4 = sr.ReadLine();
+            
             sr.Close();
 
             Controls.Clear();
@@ -218,7 +222,7 @@ namespace Gallows{
 
                             StreamReader sr = new StreamReader("dictionary.txt");
                             
-                            for (int i = 0; i < 51302; i++){//перебираем все слова в словаре
+                            for (int i = 0; i < 50911; i++){//перебираем все слова в словаре
                                 wordFromDictionary = sr.ReadLine();
 
                                 if (textBoxPlay.Text == wordFromDictionary){//проверка введенного слова
@@ -803,36 +807,45 @@ namespace Gallows{
 
         public void SaveGame(){//сохранение игры
 
+            int d = 0;
+            bool flag = false;
             //------------------- ник игрока
             save = Convert.ToString(textName.Text);
             //------------------- сохраняем слово
             save += "/";
+            d += char_word[0];
             save += Convert.ToString(char_word[0]);
             for (int i = 1; i < size_word; i++){
+                d = char_word[i] + d;
                 save += Convert.ToString(char_word[i]);
             }
             //------------------- сохраняем размер слова
             save += "/";
             save += size_word;
+            d += size_word;
             //------------------- сохраняем какие буквы угадали, а какие нет 1 - угадали, 0 - нет
             save += "/";
             for (int i = 0; i < size_word; i++){
                 if (butts[i].Text != Convert.ToString(char_word[i])){
                     save += "0";
+                    d += 10;
                 }
                 else{
+                    d += 100;
                     save += "1";
                 }
             }
             //------------------- сохранить время игры
             save += "/";
             save += Convert.ToString(timer.ElapsedMilliseconds);
+            d += Convert.ToInt32(timer.ElapsedMilliseconds);
             //------------------- количество ост. попыток
             save += "/";
             if(numberOfAttempts == 10){
                 save += "-";
             }
             else{
+                d += numberOfAttempts;
                 save += numberOfAttempts;
             }
             //------------------ отгаданные буквы
@@ -840,6 +853,7 @@ namespace Gallows{
             for (int i = 0; i < 3; i++){
                 for (int j = 0; j < 11; j++){
                     if (abcButts[i, j].BackColor == Color.Green){
+                        d += abcChar[i, j];
                         save += abcChar[i, j];
                     }
                 }
@@ -850,11 +864,14 @@ namespace Gallows{
             for (int i = 0; i < 3; i++){
                 for (int j = 0; j < 11; j++){
                     if (abcButts[i, j].BackColor == Color.Red){
+                        d += abcChar[i, j];
                         save += abcChar[i, j];
                     }
                 }
             }
-            
+            save += "/";
+            save += d;
+            save += "/";
             //выбор места сохранение
             if (save1.Length != 0 && save2.Length != 0 && save3.Length != 0){//если все ячейки сохр. заняты нужно чтобы пользователь выбрал какую перезаписать
                 Controls.Clear();
@@ -1060,98 +1077,129 @@ namespace Gallows{
         public void contMeny() {//создаем меню для выбора сохранения
             Controls.Clear();
 
-            Label label1 = new Label();
-            label1.Size = new Size(300, 70);
-            label1.Location = new Point(250, 250);
-            label1.Font = new Font(label1.Font.Name, 25, label1.Font.Style, label1.Font.Unit);
-            label1.Text = "Ячейка 1:";
-            this.Controls.Add(label1);
+            try{
+                if(save4 == null){
 
-            Label label2 = new Label();
-            label2.Size = new Size(300, 70);
-            label2.Location = new Point(250, 450);
-            label2.Font = new Font(label2.Font.Name, 25, label2.Font.Style, label2.Font.Unit);
-            label2.Text = "Ячейка 2:";
-            this.Controls.Add(label2);
+                    int flag1 = 0;
+                    int flag2 = 0;
+                    int flag3 = 0;
 
-            Label label3 = new Label();
-            label3.Size = new Size(300, 70);
-            label3.Location = new Point(250, 650);
-            label3.Font = new Font(label2.Font.Name, 25, label2.Font.Style, label2.Font.Unit);
-            label3.Text = "Ячейка 3:";
-            this.Controls.Add(label3);
+                    for(int i = 0; i < save1.Length; i++){
+                        if(save1[i] == '/') { flag1++; }
+                    }
+                    for (int i = 0; i < save2.Length; i++){
+                        if (save2[i] == '/') { flag2++; }
+                    }
+                    for (int i = 0; i < save3.Length; i++){
+                        if (save3[i] == '/') { flag3++; }
+                    }
 
-            Label labelSave = new Label();
-            labelSave.Size = new Size(1500, 100);
-            labelSave.Location = new Point(0, 40);
-            labelSave.BackColor = Color.MediumOrchid;
-            labelSave.TextAlign = ContentAlignment.TopCenter;
-            labelSave.Font = new Font(labelSave.Font.Name, 25, labelSave.Font.Style, labelSave.Font.Unit);
-            labelSave.Text = "Сохранения";
-            this.Controls.Add(labelSave);
+                    if(flag1 != 9 || flag2 != 9 || flag3 != 9){
+                        throw new Exception();
+                    }
 
-            Button buttSave1 = new Button();
-            buttSave1.Size = new Size(400, 150);
-            buttSave1.Location = new Point(550, 200);
-            buttSave1.BackColor = Color.AliceBlue;
-            if (save1.Length != 0) {//если первая ячейка не пустая деактивируем ее
-                buttSave1.Enabled = true;
-                for (int i = 0; save1[i] != '/'; i++) {
-                    buttSave1.Text += save1[i];//записываем Имя в кнопку
-                    buttSave1.Font = new Font(buttSave1.Font.Name, 20, buttSave1.Font.Style, buttSave1.Font.Unit);
+                    Label label1 = new Label();
+                    label1.Size = new Size(300, 70);
+                    label1.Location = new Point(250, 250);
+                    label1.Font = new Font(label1.Font.Name, 25, label1.Font.Style, label1.Font.Unit);
+                    label1.Text = "Ячейка 1:";
+                    this.Controls.Add(label1);
+
+                    Label label2 = new Label();
+                    label2.Size = new Size(300, 70);
+                    label2.Location = new Point(250, 450);
+                    label2.Font = new Font(label2.Font.Name, 25, label2.Font.Style, label2.Font.Unit);
+                    label2.Text = "Ячейка 2:";
+                    this.Controls.Add(label2);
+
+                    Label label3 = new Label();
+                    label3.Size = new Size(300, 70);
+                    label3.Location = new Point(250, 650);
+                    label3.Font = new Font(label2.Font.Name, 25, label2.Font.Style, label2.Font.Unit);
+                    label3.Text = "Ячейка 3:";
+                    this.Controls.Add(label3);
+
+                    Label labelSave = new Label();
+                    labelSave.Size = new Size(1500, 100);
+                    labelSave.Location = new Point(0, 40);
+                    labelSave.BackColor = Color.MediumOrchid;
+                    labelSave.TextAlign = ContentAlignment.TopCenter;
+                    labelSave.Font = new Font(labelSave.Font.Name, 25, labelSave.Font.Style, labelSave.Font.Unit);
+                    labelSave.Text = "Сохранения";
+                    this.Controls.Add(labelSave);
+
+                    Button buttSave1 = new Button();
+                    buttSave1.Size = new Size(400, 150);
+                    buttSave1.Location = new Point(550, 200);
+                    buttSave1.BackColor = Color.AliceBlue;
+                    if (save1.Length != 0){//если первая ячейка не пустая деактивируем ее
+                        buttSave1.Enabled = true;
+                        for (int i = 0; save1[i] != '/'; i++){
+                            buttSave1.Text += save1[i];//записываем Имя в кнопку
+                            buttSave1.Font = new Font(buttSave1.Font.Name, 20, buttSave1.Font.Style, buttSave1.Font.Unit);
+                        }
+                        buttSave1.Click += new EventHandler(OnButtonContinue);
+                    }
+                    else{
+                        buttSave1.Enabled = false;
+                    }
+                    this.Controls.Add(buttSave1);
+
+                    Button buttSave2 = new Button();
+                    buttSave2.Size = new Size(400, 150);
+                    buttSave2.Location = new Point(550, 400);
+                    buttSave2.BackColor = Color.AliceBlue;
+                    if (save2.Length != 0){//если вторая ячейка не пустая деактивируем ее
+                        buttSave2.Enabled = true;
+                        for (int i = 0; save2[i] != '/'; i++){
+                            buttSave2.Text += save2[i];//записываем Имя в кнопку
+                            buttSave2.Font = new Font(buttSave2.Font.Name, 20, buttSave2.Font.Style, buttSave2.Font.Unit);
+                        }
+                        buttSave2.Click += new EventHandler(OnButtonContinue);
+                    }
+                    else{
+                        buttSave2.Enabled = false;
+                    }
+                    this.Controls.Add(buttSave2);
+
+                    Button buttSave3 = new Button();
+                    buttSave3.Size = new Size(400, 150);
+                    buttSave3.Location = new Point(550, 600);
+                    buttSave3.BackColor = Color.AliceBlue;
+                    if (save3.Length != 0){//если третья ячейка не пустая деактивируем ее
+                        buttSave3.Enabled = true;
+                        for (int i = 0; save3[i] != '/'; i++)
+                        {
+                            buttSave3.Text += save3[i];//записываем Имя в кнопку
+                            buttSave3.Font = new Font(buttSave3.Font.Name, 20, buttSave3.Font.Style, buttSave3.Font.Unit);
+                        }
+                        buttSave3.Click += new EventHandler(OnButtonContinue);
+                    }
+                    else{
+                        buttSave3.Enabled = false;
+                    }
+                    this.Controls.Add(buttSave3);
+
+                    Button buttBack = new Button();//кнопка "Назад"
+                    buttBack.Size = new Size(200, 80);
+                    buttBack.Location = new Point(1250, 750);
+                    buttBack.BackColor = Color.AliceBlue;
+                    buttBack.Enabled = true;
+                    buttBack.Font = new Font(buttBack.Font.Name, 16, buttBack.Font.Style, buttBack.Font.Unit);
+                    buttBack.Text = "Назад";
+                    buttBack.Click += new EventHandler(OnButtonContinue);
+
+                    this.Controls.Add(buttBack);
+                    GC.Collect();
                 }
-                buttSave1.Click += new EventHandler(OnButtonContinue);
-            }
-            else {
-                buttSave1.Enabled = false;
-            }
-            this.Controls.Add(buttSave1);
-
-            Button buttSave2 = new Button();
-            buttSave2.Size = new Size(400, 150);
-            buttSave2.Location = new Point(550, 400);
-            buttSave2.BackColor = Color.AliceBlue;
-            if (save2.Length != 0) {//если вторая ячейка не пустая деактивируем ее
-                buttSave2.Enabled = true;
-                for (int i = 0; save2[i] != '/'; i++) {
-                    buttSave2.Text += save2[i];//записываем Имя в кнопку
-                    buttSave2.Font = new Font(buttSave2.Font.Name, 20, buttSave2.Font.Style, buttSave2.Font.Unit);
+                else{
+                    throw new Exception();
                 }
-                buttSave2.Click += new EventHandler(OnButtonContinue);
             }
-            else {
-                buttSave2.Enabled = false;
+            catch (Exception){
+                MessageBox.Show("Целосность файла c сохранениями нарушена");
+                InitMeny();
             }
-            this.Controls.Add(buttSave2);
-
-            Button buttSave3 = new Button();
-            buttSave3.Size = new Size(400, 150);
-            buttSave3.Location = new Point(550, 600);
-            buttSave3.BackColor = Color.AliceBlue;
-            if (save3.Length != 0) {//если третья ячейка не пустая деактивируем ее
-                buttSave3.Enabled = true;
-                for (int i = 0; save3[i] != '/'; i++){
-                    buttSave3.Text += save3[i];//записываем Имя в кнопку
-                    buttSave3.Font = new Font(buttSave3.Font.Name, 20, buttSave3.Font.Style, buttSave3.Font.Unit);
-                }
-                buttSave3.Click += new EventHandler(OnButtonContinue);
-            }
-            else{
-                buttSave3.Enabled = false;
-            }
-            this.Controls.Add(buttSave3);
-
-            Button buttBack = new Button();//кнопка "Назад"
-            buttBack.Size = new Size(200, 80);
-            buttBack.Location = new Point(1250, 750);
-            buttBack.BackColor = Color.AliceBlue;
-            buttBack.Enabled = true;
-            buttBack.Font = new Font(buttBack.Font.Name, 16, buttBack.Font.Style, buttBack.Font.Unit);
-            buttBack.Text = "Назад";
-            buttBack.Click += new EventHandler(OnButtonContinue);
-            
-            this.Controls.Add(buttBack);
-            GC.Collect();
         }//выбор сохраняения
 
         public void OnButtonContinue(object sender, EventArgs e){
@@ -1160,6 +1208,9 @@ namespace Gallows{
             int flag1 = 0;//флаг для того чтобы пропустить Имя (оно в сохранении идет первым)
             int j = 0;//для записи имя
             timeSave = null;//время игры
+            int test = 0;//в данную переменную считается контрольная сумма
+            string testSum = null;//переменная для проверки контрольной суммы
+            string testWorld = null;//переменная для проверки слова на его существования
             switch (pressedButton.Location.Y){
                 case 750://кнопка назад
                     Controls.Clear();
@@ -1167,193 +1218,348 @@ namespace Gallows{
                     InitMeny();
                     break;
                 case 200://первая ячейка сохранения
-                    needSave = true;
-                    for (int i = 0; i != save1.Length; i++){
-                        switch (flag1) {
-                            case 0://пропускаем имя
-                                if(save1[i] == '/') { flag1 = 1; }
-                                break;
-                            case 1://считываем слово
-                                if(save1[i] != '/') {
-                                    char_word[j] = save1[i];
-                                    j++;
-                                }
-                                else {
-                                    flag1 = 2;
-                                }
-                                break;
-                            case 2://размер слова
-                                if (save1[i] == '/'){
-                                    for (int k = 0; char_word[k] != '\0'; k++){
-                                        size_word++;
+                    try{
+                        needSave = true;
+                        for (int i = 0; i != save1.Length; i++){
+                            switch (flag1){
+                                case 0://пропускаем имя
+                                    if (save1[i] == '/') { flag1 = 1; }
+                                    break;
+                                case 1://считываем слово
+                                    if (save1[i] != '/'){
+                                        char_word[j] = save1[i];
+                                        test += char_word[j];
+                                        testWorld += save1[i];
+                                        j++;
                                     }
-                                    flag1 = 3;
-                                }
-                                break;
-                            case 3://какие угаданы а какие нет
-                                if(save1[i] != '/'){
-                                    guessedLetters += save1[i];
-                                }
-                                else{
-                                    flag1 = 4;
-                                }
-                                break;
-                            case 4://время
-                                if(save1[i] != '/'){
-                                    timeSave += save1[i];
-                                }
-                                else{
-                                    flag1 = 5;
-                                }
-                                break;
-                            case 5://количество попыток
-                                if (save1[i] == '/'){
-                                    flag1 = 6;
-                                }
-                                break;
-                            case 6://буквы которые верно введены
-                                if(save1[i] != '/'){
-                                    correctLetters += save1[i];
-                                }
-                                else{
-                                    flag1 = 7;
-                                }
-                                break;
-                            case 7://буквы которые неверно введены
-                                wrongLetters += save1[i];
-                                numberOfAttempts--;
-                                break;
+                                    else{
+                                        StreamReader sr = new StreamReader("dictionary.txt");
+                                        string wordFromDictionary = null;
+                                        bool flag = false;
+                                        for (int k = 0; k < 50911; k++){
+                                            wordFromDictionary = sr.ReadLine();
+                                            if (testWorld == wordFromDictionary){
+                                                flag = true;
+                                            }
+                                        }
+                                        sr.Close();
+                                        flag1 = 2;
+                                        if (flag == false){
+                                            throw new Exception();
+                                        }
+                                    }
+                                    break;
+                                case 2://размер слова
+                                    if (save1[i] == '/'){
+                                        for (int k = 0; char_word[k] != '\0'; k++){
+                                            size_word++;
+                                        }
+                                        test += size_word;
+                                        flag1 = 3;
+                                    }
+                                    break;
+                                case 3://какие угаданы а какие нет
+                                    if (save1[i] != '/'){
+                                        guessedLetters += save1[i];
+                                        if (save1[i] == '0'){
+                                            test += 10;
+                                        }
+                                        if (save1[i] == '1'){
+                                            test += 100;
+                                        }
+                                    }
+                                    else{
+                                        flag1 = 4;
+                                    }
+                                    break;
+                                case 4://время
+                                    if (save1[i] != '/'){
+                                        timeSave += save1[i];
+                                    }
+                                    else{
+                                        test += Convert.ToInt32(timeSave);
+                                        flag1 = 5;
+                                    }
+                                    break;
+                                case 5://количество попыток
+                                    if (save1[i] == '/'){
+                                        flag1 = 6;
+                                    }
+                                    break;
+                                case 6://буквы которые верно введены
+                                    if (save1[i] != '/'){
+                                        correctLetters += save1[i];
+                                        test += save1[i];
+                                    }
+                                    else{
+                                        flag1 = 7;
+                                    }
+                                    break;
+                                case 7://буквы которые неверно введены
+                                    if (save1[i] != '/'){
+                                        wrongLetters += save1[i];
+                                        test += save1[i];
+                                        numberOfAttempts--;
+                                    }
+                                    else{
+                                        if (wrongLetters != null){
+                                            test += numberOfAttempts;
+                                        }
+                                        flag1 = 8;
+                                    }
+                                    break;
+                                case 8:
+                                    if (save1[i] != '/'){
+                                        testSum += save1[i];
+                                    }
+                                    else{
+                                        flag1 = 9;
+                                    }
+                                    break;
+                            }
+                        }
+                        if (test == Convert.ToInt32(testSum)){
+                            Controls.Clear();
+                            GC.Collect();
+                            StartGame();
+                        }
+                        else{
+                            throw new Exception();
                         }
                     }
-                    Controls.Clear();
-                    GC.Collect();
-                    StartGame();
+                    catch (Exception){
+                        MessageBox.Show("Целосность файла сохранения нарушена");
+                        needSave = false;
+                    }
                     break;
                 case 400://вторая ячейка
-                    needSave = true;
-                    for (int i = 0; i != save2.Length; i++){
-                        switch (flag1){
-                            case 0://пропускаем имя
-                                if (save2[i] == '/') { flag1 = 1; }
-                                break;
-                            case 1://считываем слово
-                                if (save2[i] != '/'){
-                                    char_word[j] = save2[i];
-                                    j++;
-                                }
-                                else{
-                                    flag1 = 2;
-                                }
-                                break;
-                            case 2://размер слова
-                                if (save2[i] == '/'){
-                                    for (int k = 0; char_word[k] != '\0'; k++){
-                                        size_word++;
+                    try{
+                        needSave = true;
+                        for (int i = 0; i != save2.Length; i++){
+                            switch (flag1){
+                                case 0://пропускаем имя
+                                    if (save2[i] == '/') { flag1 = 1; }
+                                    break;
+                                case 1://считываем слово
+                                    if (save2[i] != '/'){
+                                        char_word[j] = save2[i];
+                                        test += char_word[j];
+                                        testWorld += save2[i];
+                                        j++;
                                     }
-                                    flag1 = 3;
-                                }
-                                break;
-                            case 3://какие угаданы а какие нет
-                                if (save2[i] != '/'){
-                                    guessedLetters += save2[i];
-                                }
-                                else{
-                                    flag1 = 4;
-                                }
-                                break;
-                            case 4://время
-                                if (save2[i] != '/'){
-                                    timeSave += save2[i];
-                                }
-                                else{
-                                    flag1 = 5;
-                                }
-                                break;
-                            case 5://количество попыток
-                                if (save2[i] == '/'){
-                                    flag1 = 6;
-                                }
-                                break;
-                            case 6://буквы которые верно введены
-                                if (save2[i] != '/'){
-                                    correctLetters += save2[i];
-                                }
-                                else{
-                                    flag1 = 7;
-                                }
-                                break;
-                            case 7://буквы которые неверно введены
-                                wrongLetters += save2[i];
-                                numberOfAttempts--;
-                                break;
+                                    else{
+                                        StreamReader sr = new StreamReader("dictionary.txt");
+                                        string wordFromDictionary = null;
+                                        bool flag = false;
+                                        for (int k = 0; k < 50911; k++){
+                                            wordFromDictionary = sr.ReadLine();
+                                            if (testWorld == wordFromDictionary) {
+                                                flag = true;
+                                            }
+                                        }
+                                        sr.Close();
+                                        flag1 = 2;
+                                        if (flag == false){
+                                            throw new Exception();
+                                        }
+                                    }
+                                    break;
+                                case 2://размер слова
+                                    if (save2[i] == '/'){
+                                        for (int k = 0; char_word[k] != '\0'; k++){
+                                            size_word++;
+                                        }
+                                        test += size_word;
+                                        flag1 = 3;
+                                    }
+                                    break;
+                                case 3://какие угаданы а какие нет
+                                    if (save2[i] != '/'){
+                                        guessedLetters += save2[i];
+                                        if (save2[i] == '0'){
+                                            test += 10;
+                                        }
+                                        if (save2[i] == '1'){
+                                            test += 100;
+                                        }
+                                    }
+                                    else{
+                                        flag1 = 4;
+                                    }
+                                    break;
+                                case 4://время
+                                    if (save2[i] != '/'){
+                                        timeSave += save2[i];
+                                    }
+                                    else{
+                                        test += Convert.ToInt32(timeSave);
+                                        flag1 = 5;
+                                    }
+                                    break;
+                                case 5://количество попыток
+                                    if (save2[i] == '/'){
+                                        flag1 = 6;
+                                    }
+                                    break;
+                                case 6://буквы которые верно введены
+                                    if (save2[i] != '/'){
+                                        correctLetters += save2[i];
+                                        test += save2[i];
+                                    }
+                                    else{
+                                        flag1 = 7;
+                                    }
+                                    break;
+                                case 7://буквы которые неверно введены
+                                    if (save2[i] != '/'){
+                                        wrongLetters += save2[i];
+                                        test += save2[i];
+                                        numberOfAttempts--;
+                                    }
+                                    else{
+                                        if (wrongLetters != null){
+                                            test += numberOfAttempts;
+                                        }
+                                        flag1 = 8;
+                                    }
+                                    break;
+                                case 8:
+                                    if (save2[i] != '/'){
+                                        testSum += save2[i];
+                                    }
+                                    else{
+                                        flag1 = 9;
+                                    }
+                                    break;
+                            }
+                        }
+                        if (test == Convert.ToInt32(testSum)){
+                            Controls.Clear();
+                            GC.Collect();
+                            StartGame();
+                        }
+                        else{
+                            throw new Exception();
                         }
                     }
-                    Controls.Clear();
-                    GC.Collect();
-                    StartGame();
+                    catch (Exception){
+                        MessageBox.Show("Целосность файла сохранения нарушена");
+                        needSave = false;
+                    }
                     break;
                 case 600://третья ячейка
-                    needSave = true;
-                    for (int i = 0; i != save3.Length; i++){
-                        switch (flag1){
-                            case 0://пропускаем имя
-                                if (save3[i] == '/') { flag1 = 1; }
-                                break;
-                            case 1://считываем слово
-                                if (save3[i] != '/'){
-                                    char_word[j] = save3[i];
-                                    j++;
-                                }
-                                else{
-                                    flag1 = 2;
-                                }
-                                break;
-                            case 2://размер слова
-                                if (save3[i] == '/'){
-                                    for (int k = 0; char_word[k] != '\0'; k++){
-                                        size_word++;
+                    try{
+                        needSave = true;
+                        for (int i = 0; i != save3.Length; i++){
+                            switch (flag1){
+                                case 0://пропускаем имя
+                                    if (save3[i] == '/') { flag1 = 1; }
+                                    break;
+                                case 1://считываем слово
+                                    if (save3[i] != '/'){
+                                        char_word[j] = save3[i];
+                                        test += char_word[j];
+                                        testWorld += save3[i];
+                                        j++;
                                     }
-                                    flag1 = 3;
-                                }
-                                break;
-                            case 3://какие угаданы а какие нет
-                                if (save3[i] != '/'){
-                                    guessedLetters += save3[i];
-                                }
-                                else{
-                                    flag1 = 4;
-                                }
-                                break;
-                            case 4://время
-                                if (save3[i] != '/'){
-                                    timeSave += save3[i];
-                                }
-                                else{
-                                    flag1 = 5;
-                                }
-                                break;
-                            case 5://количество попыток
-                                if (save3[i] == '/'){
-                                    flag1 = 6;
-                                }
-                                break;
-                            case 6://буквы которые верно введены
-                                if (save3[i] != '/'){
-                                    correctLetters += save3[i];
-                                }
-                                else{
-                                    flag1 = 7;
-                                }
-                                break;
-                            case 7://буквы которые неверно введены
-                                wrongLetters += save3[i];
-                                numberOfAttempts--;
-                                break;
+                                    else{
+                                        StreamReader sr = new StreamReader("dictionary.txt");
+                                        string wordFromDictionary = null;
+                                        bool flag = false;
+                                        for (int k = 0; k < 50911; k++){
+                                            wordFromDictionary = sr.ReadLine();
+                                            if (testWorld == wordFromDictionary){
+                                                flag = true;
+                                            }
+                                        }
+                                        sr.Close();
+                                        flag1 = 2;{
+                                            throw new Exception();
+                                        }
+                                    }
+                                    break;
+                                case 2://размер слова
+                                    if (save3[i] == '/'){
+                                        for (int k = 0; char_word[k] != '\0'; k++){
+                                            size_word++;
+                                        }
+                                        test += size_word;
+                                        flag1 = 3;
+                                    }
+                                    break;
+                                case 3://какие угаданы а какие нет
+                                    if (save3[i] != '/'){
+                                        guessedLetters += save3[i];
+                                        if (save3[i] == '0'){
+                                            test += 10;
+                                        }
+                                        if (save3[i] == '1'){
+                                            test += 100;
+                                        }
+                                    }
+                                    else{
+                                        flag1 = 4;
+                                    }
+                                    break;
+                                case 4://время
+                                    if (save3[i] != '/'){
+                                        timeSave += save3[i];
+                                    }
+                                    else{
+                                        test += Convert.ToInt32(timeSave);
+                                        flag1 = 5;
+                                    }
+                                    break;
+                                case 5://количество попыток
+                                    if (save3[i] == '/'){
+                                        flag1 = 6;
+                                    }
+                                    break;
+                                case 6://буквы которые верно введены
+                                    if (save3[i] != '/'){
+                                        correctLetters += save3[i];
+                                        test += save3[i];
+                                    }
+                                    else{
+                                        flag1 = 7;
+                                    }
+                                    break;
+                                case 7://буквы которые неверно введены
+                                    if (save3[i] != '/'){
+                                        wrongLetters += save3[i];
+                                        test += save3[i];
+                                        numberOfAttempts--;
+                                    }
+                                    else{
+                                        if (wrongLetters != null){
+                                            test += numberOfAttempts;
+                                        }
+                                        flag1 = 8;
+                                    }
+                                    break;
+                                case 8:
+                                    if (save3[i] != '/'){
+                                        testSum += save3[i];
+                                    }
+                                    else{
+                                        flag1 = 9;
+                                    }
+                                    break;
+                            }
+                        }
+                        if (test == Convert.ToInt32(testSum)){
+                            Controls.Clear();
+                            GC.Collect();
+                            StartGame();
+                        }
+                        else{
+                            throw new Exception();
                         }
                     }
-                    Controls.Clear();
-                    GC.Collect();
-                    StartGame();
+                    catch (Exception){
+                        MessageBox.Show("Целосность файла сохранения нарушена");
+                        needSave = false;
+                    }
                     break;
             }
         }//оброботываю какое сохранение хочет переписать пользователь
@@ -1385,7 +1591,6 @@ namespace Gallows{
                         }
                     }
                 }
-                
             }
             catch(Exception) {}
 
