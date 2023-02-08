@@ -1,2 +1,6 @@
 # Gallows
-Word game: two people play, the first one thinks of a word, enters it into a computer. The computer for the second player shows on the screen the first and last letter of the intended word, instead of the rest of the letters - dashes. The player tries to guess the intended word by entering the appropriate letters. If the entered letter is not in the word, the elements of the “gallows” appear on the screen, etc.
+
+Игра в слова: играют два человека, первый загадывает слово, вводит его в программу. Компьютер для второго игрока показывает на экране первую и последнюю букву задуманного слова, вместо остальных букв - прочерки. Игрок пытается угадать задуманное слово, вводя соответствующие буквы. Если введенной буквы нет в слове, на экране появляются элементы «виселицы». У игрока есть 10 попыток, чтобы угадать слово. 
+Во время игры есть возожность сохранить игру и вернуться к ней позже.
+После завершения пользователя просят ввести имя и фами
+Сохраненные файлы защищены при помощи контрольной суммы.
